@@ -35,7 +35,7 @@ pipeline {
                 junit 'test-results.xml'
             }
         }
-        # troubleshooting purposes
+        // troubleshooting purposes
         stage('Debug Branch') {
             steps {
                 sh 'echo BRANCH_NAME=$BRANCH_NAME'
@@ -70,7 +70,7 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                        # check login status. sucessful or failure
+                        // check login status. sucessful or failure
                         docker info | grep username
 
 

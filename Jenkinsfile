@@ -42,6 +42,10 @@ pipeline {
                     docker build -t ${IMAGE_NAME}:${TAG} .
                 '''
                 echo 'DOCKER IMAGE BUILD SUCCESSFUL'
+                
+                sh '''
+                    ls
+                '''
             }
         }
 
@@ -55,10 +59,15 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    
+
                     echo ' about to login into dockerhub ....'
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+                        // check login status. sucessful or failure
+                        docker info | grep username
+
+
                         docker push ${IMAGE_NAME}:${TAG}
                         docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
                         docker push ${IMAGE_NAME}:latest

@@ -1,4 +1,3 @@
-Perfect — I’ll create a **complete, ready-to-run Flask project with Jenkins CI/CD**. Everything will be included: project structure, `app.py`, `requirements.txt`, tests, Dockerfile, and Jenkinsfile. You can literally clone this and run it.
 
 ---
 

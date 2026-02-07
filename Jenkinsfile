@@ -46,7 +46,7 @@ pipeline {
 
         stage('Push Docker Image') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 withCredentials([usernamePassword(
@@ -66,7 +66,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 sh '''

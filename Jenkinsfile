@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VENV = "venv"
-        IMAGE_NAME = "mydockeruser/flask-app"
+        IMAGE_NAME = "egamor/jenkins-flask-app"
         TAG = "${BUILD_NUMBER}"
     }
 
@@ -35,6 +35,12 @@ pipeline {
                 junit 'test-results.xml'
             }
         }
+        # troubleshooting purposes
+        stage('Debug Branch') {
+            steps {
+                sh 'echo BRANCH_NAME=$BRANCH_NAME'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -42,7 +48,7 @@ pipeline {
                     docker build -t ${IMAGE_NAME}:${TAG} .
                 '''
                 echo 'DOCKER IMAGE BUILD SUCCESSFUL'
-                
+
                 sh '''
                     ls
                 '''
@@ -64,7 +70,7 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                        // check login status. sucessful or failure
+                        # check login status. sucessful or failure
                         docker info | grep username
 
 

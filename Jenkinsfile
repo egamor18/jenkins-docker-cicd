@@ -77,7 +77,7 @@ pipeline {
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
                         #check login status. sucessful or failure
-                        #docker info | grep username
+                        docker info
 
 
                         set -e

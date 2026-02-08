@@ -56,9 +56,12 @@ pipeline {
         }
 
         stage('Push Docker Image') {
+            /*
             when {
                 branch 'master'
-            }
+            } 
+            */
+
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
@@ -83,9 +86,11 @@ pipeline {
         }
 
         stage('Deploy') {
+            /*
             when {
                 branch 'master'
             }
+            */
             steps {
                 sh '''
                     echo "Deploying Flask app..."

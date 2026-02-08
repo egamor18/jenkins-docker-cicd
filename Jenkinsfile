@@ -57,7 +57,8 @@ pipeline {
                     }
 
                 '''
-                //echo 'DOCKER IMAGE BUILD SUCCESSFUL'
+                //lets archive the artifacts
+                archiveArtifacts artifacts build.log
 
             }
         }
@@ -97,6 +98,7 @@ pipeline {
 
                         echo "Docker push successful"
                     '''
+                    //to save the logs
                     archiveArtifacts artifacts: 'push.log'
 
                 }

@@ -58,7 +58,7 @@ pipeline {
 
                 '''
                 //lets archive the artifacts
-                archiveArtifacts artifacts: 'build.log'
+                archiveArtifacts artifacts: 'build.log', fingerprint: true
 
             }
         }

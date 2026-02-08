@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh '''
                     . ${VENV}/bin/activate
-                    pytest -q --junitxml=test-results.xml || true
+                    pytest --junitxml=test-results.xml > test.log 2>&1 || true
                 '''
                 junit 'test-results.xml'
             }

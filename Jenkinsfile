@@ -72,19 +72,27 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
 
+                    /*
                     echo ' about to login into dockerhub ....'
                     sh '''
+                        set -e
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
                         #check login status. sucessful or failure
 
                         if [ $? -eq 0 ]; then
                             echo " Login successful"
+                            
+                            #docker push ${IMAGE_NAME}:${TAG}
+                            #redirect output to push.log
+                            docker push ${IMAGE_NAME}:${TAG} > push.log 2>&1
 
-                            set -e
-                            docker push ${IMAGE_NAME}:${TAG}
+                            #tagging as the latest
                             docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
-                            docker push ${IMAGE_NAME}:latest
+
+                            #push the image again with the latest tag
+                            docker push ${IMAGE_NAME}:latest >> push.log 2>&1
+
                             echo "All Docker operations succeeded"
 
                         else
@@ -92,6 +100,32 @@ pipeline {
                         fi   
 
                     '''
+                    archiveArtifacts artifacts: 'push.log', fingerprint: true
+                    */
+
+                    sh '''
+                        echo "Logging into Docker..."
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin || exit 1
+
+                        #redirect the output to push.log and display error upon failure
+                        docker push ${IMAGE_NAME}:${TAG} > push.log 2>&1 || {
+                            echo "Push failed"
+                            cat push.log
+                            exit 1
+                        }
+
+                        docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
+                        docker push ${IMAGE_NAME}:latest >> push.log 2>&1 || {
+                            echo "Latest push failed"
+                            cat push.log
+                            exit 1
+                        }
+
+                        echo "Docker push successful"
+                    '''
+                    archiveArtifacts artifacts: 'push.log'
+
+
                 }
             }
         }

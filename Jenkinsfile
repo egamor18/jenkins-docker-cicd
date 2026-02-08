@@ -103,55 +103,33 @@ pipeline {
             }
         }
 
-stage('Deploy') {
-   
-        steps {
-            sh '''
-                echo "Deploying Flask app locally..."
-
-                CONTAINER_NAME="flask-app"
-
-                # Stop existing container if running
-                if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
-                    echo "Stopping existing container..."
-                    docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
-                fi
-
-                # Run new container
-                docker run -d --name $CONTAINER_NAME -p 5000:5000 ${IMAGE_NAME}:latest
-
-                # Optional: check if container started
-                if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
-                    echo "Deployment successful!"
-                else
-                    echo "Deployment failed!"
-                    exit 1
-                fi
-            '''
-        }
-    }
-
-}
-
-
-
-
-        /*
-        stage('Deploy') {
-                
+    stage('Deploy') {
+       
             steps {
                 sh '''
-                    echo "Deploying Flask app..."
-                    # Example deploy: restart Docker container on server
-                    ssh user@server "docker pull ${IMAGE_NAME}:latest && docker stop flask-app && docker run -d --name flask-app -p 5000:5000 ${IMAGE_NAME}:latest"
+                    echo "Deploying Flask app locally..."
+
+                    CONTAINER_NAME="flask-app"
+
+                    # Stop existing container if running
+                    if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+                        echo "Stopping existing container..."
+                        docker stop $CONTAINER_NAME && docker rm $CONTAINER_NAME
+                    fi
+
+                    # Run new container
+                    docker run -d --name $CONTAINER_NAME -p 5000:5000 ${IMAGE_NAME}:latest
+
+                    # Optional: check if container started
+                    if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+                        echo "Deployment successful!"
+                    else
+                        echo "Deployment failed!"
+                        exit 1
+                    fi
                 '''
-
-
             }
         }
 
-        */
-        
-    }
 }
 

@@ -103,7 +103,45 @@ pipeline {
             }
         }
 
+stage('Deploy') {
 
+    steps {
+        withCredentials([sshUserPrivateKey(
+            credentialsId: 'server-ssh-key', 
+            keyFileVariable: 'SSH_KEY', 
+            usernameVariable: 'SSH_USER'
+        )]) {
+            sh '''
+                echo "Deploying Flask app to remote server..."
+
+                # Define server address and container name
+                SERVER="127.0.0.1"
+                CONTAINER_NAME="flask-app"
+
+                # Pull latest image and restart container
+                ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$SERVER "
+                    set -e
+                    echo 'Pulling latest Docker image...'
+                    docker pull ${IMAGE_NAME}:latest
+
+                    if [ \$(docker ps -q -f name=${CONTAINER_NAME}) ]; then
+                        echo 'Stopping existing container...'
+                        docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}
+                    fi
+
+                    echo 'Starting new container...'
+                    docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${IMAGE_NAME}:latest
+                    echo 'Deployment successful!'
+                "
+            '''
+        }
+    }
+}
+
+
+
+
+        /*
         stage('Deploy') {
                 
             steps {
@@ -116,6 +154,8 @@ pipeline {
 
             }
         }
+
+        */
         
     }
 }

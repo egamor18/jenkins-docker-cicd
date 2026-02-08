@@ -21,8 +21,8 @@ pipeline {
                 sh '''
                     python3 -m venv ${VENV}
                     . ${VENV}/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install -q --upgrade pip
+                    pip install -q -r requirements.txt
                 '''
             }
         }
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 sh '''
                     . ${VENV}/bin/activate
-                    pytest --junitxml=test-results.xml || true
+                    pytest -q --junitxml=test-results.xml || true
                 '''
                 junit 'test-results.xml'
             }

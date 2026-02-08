@@ -106,19 +106,20 @@ pipeline {
         }
 
     stage('Deploy') {
-    steps {
-        sshagent(credentials: ['server-ssh-key']) {
-            sh """
-            ssh -o StrictHostKeyChecking=no ubuntu@ec2-52-59-219-191.eu-central-1.compute.amazonaws.com '
-                docker pull egamor/jenkins-flask-app:latest &&
-                docker stop flask-app || true &&
-                docker rm flask-app || true &&
-                docker run -d --name flask-app -p 5000:5000 egamor/jenkins-flask-app:latest
-            '
-            """
+        
+        steps {
+            sshagent(credentials: ['server-ssh-key']) {
+                sh """
+                ssh -o StrictHostKeyChecking=no ubuntu@ec2-52-59-219-191.eu-central-1.compute.amazonaws.com '
+                    docker pull egamor/jenkins-flask-app:latest &&
+                    docker stop flask-app || true &&
+                    docker rm flask-app || true &&
+                    docker run -d --name flask-app -p 5000:5000 egamor/jenkins-flask-app:latest
+                '
+                """
+            }
         }
     }
-}
 
 
 }

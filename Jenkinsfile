@@ -103,21 +103,20 @@ pipeline {
             }
         }
 
-        /*
+
         stage('Deploy') {
-            
-            when {
-                branch 'master'
-            }
-            
+                
             steps {
                 sh '''
                     echo "Deploying Flask app..."
                     # Example deploy: restart Docker container on server
-                    # ssh user@server "docker pull ${IMAGE_NAME}:latest && docker stop flask-app && docker run -d --name flask-app -p 5000:5000 ${IMAGE_NAME}:latest"
+                    ssh user@server "docker pull ${IMAGE_NAME}:latest && docker stop flask-app && docker run -d --name flask-app -p 5000:5000 ${IMAGE_NAME}:latest"
                 '''
+
+
             }
         }
-        */
+        
     }
 }
+

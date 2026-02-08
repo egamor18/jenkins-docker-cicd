@@ -78,8 +78,14 @@ pipeline {
 
 
                         docker push ${IMAGE_NAME}:${TAG}
+                        [ $? -ne 0 ] && echo "Push failed" && exit 1
+
                         docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
+                        [ $? -ne 0 ] && echo "Tagging failed" && exit 1
+
                         docker push ${IMAGE_NAME}:latest
+                        [ $? -ne 0 ] && echo "Push latest failed" && exit 1
+
                     '''
                 }
             }

@@ -4,7 +4,8 @@ pipeline {
     environment {
         VENV = "venv"
         IMAGE_NAME = "egamor/jenkins-flask-app"
-        TAG = "${BUILD_NUMBER}"
+        //TAG = "${BUILD_NUMBER}"
+        TAG = 3
     }
 
     stages {
@@ -14,7 +15,7 @@ pipeline {
                 checkout scm
             }
         }
-/*
+
         stage('Setup & Build') {
             steps {
                 sh '''
@@ -42,7 +43,6 @@ pipeline {
             }
         }
 
-*/
 
         stage('Build Docker Image') {
             steps {
@@ -131,6 +131,6 @@ pipeline {
             }
         }
 
-}
+    }
 
 }

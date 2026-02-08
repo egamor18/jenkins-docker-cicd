@@ -41,6 +41,7 @@ pipeline {
                 sh 'echo BRANCH_NAME=$BRANCH_NAME'
             }
         }
+
 */
 
         stage('Build Docker Image') {
@@ -55,6 +56,7 @@ pipeline {
                 '''
             }
         }
+
 
         stage('Push Docker Image') {
             /*

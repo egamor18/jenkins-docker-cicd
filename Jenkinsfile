@@ -88,13 +88,14 @@ pipeline {
                 }
             }
         }
+        
         /*
         stage('Deploy') {
-            /*
+            
             when {
                 branch 'master'
             }
-            */
+            
             steps {
                 sh '''
                     echo "Deploying Flask app..."
@@ -103,7 +104,6 @@ pipeline {
                 '''
             }
         }
-
         */
     }
 }

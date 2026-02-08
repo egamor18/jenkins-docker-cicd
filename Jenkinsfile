@@ -47,13 +47,18 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t ${IMAGE_NAME}:${TAG} .
-                '''
-                echo 'DOCKER IMAGE BUILD SUCCESSFUL'
+                    #docker build -t ${IMAGE_NAME}:${TAG} .
 
-                sh '''
-                    ls
+
+                    docker build -t ${IMAGE_NAME}:${TAG} . > build.log 2>&1 || {
+                            echo "Build failed"
+                            cat build.log
+                            exit 1
+                    }
+
                 '''
+                //echo 'DOCKER IMAGE BUILD SUCCESSFUL'
+
             }
         }
 
@@ -71,37 +76,6 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
-                    /*
-                    echo ' about to login into dockerhub ....'
-                    sh '''
-                        set -e
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
-                        #check login status. sucessful or failure
-
-                        if [ $? -eq 0 ]; then
-                            echo " Login successful"
-                            
-                            #docker push ${IMAGE_NAME}:${TAG}
-                            #redirect output to push.log
-                            docker push ${IMAGE_NAME}:${TAG} > push.log 2>&1
-
-                            #tagging as the latest
-                            docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
-
-                            #push the image again with the latest tag
-                            docker push ${IMAGE_NAME}:latest >> push.log 2>&1
-
-                            echo "All Docker operations succeeded"
-
-                        else
-                            echo "Login failed"
-                        fi   
-
-                    '''
-                    archiveArtifacts artifacts: 'push.log', fingerprint: true
-                    */
 
                     sh '''
                         echo "Logging into Docker..."
@@ -124,7 +98,6 @@ pipeline {
                         echo "Docker push successful"
                     '''
                     archiveArtifacts artifacts: 'push.log'
-
 
                 }
             }

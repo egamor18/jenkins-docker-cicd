@@ -74,24 +74,21 @@ pipeline {
                     sh '''
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                         #check login status. sucessful or failure
+                        #check login status. sucessful or failure
                         docker info | grep username
 
 
+                        set -e
                         docker push ${IMAGE_NAME}:${TAG}
-                        [ $? -ne 0 ] && echo "Push failed" && exit 1
-
                         docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
-                        [ $? -ne 0 ] && echo "Tagging failed" && exit 1
-
                         docker push ${IMAGE_NAME}:latest
-                        [ $? -ne 0 ] && echo "Push latest failed" && exit 1
+                        echo "All Docker operations succeeded"
 
                     '''
                 }
             }
         }
-
+        /*
         stage('Deploy') {
             /*
             when {
@@ -106,5 +103,7 @@ pipeline {
                 '''
             }
         }
+
+        */
     }
 }

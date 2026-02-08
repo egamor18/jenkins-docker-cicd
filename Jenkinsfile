@@ -77,14 +77,19 @@ pipeline {
                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
                         #check login status. sucessful or failure
-                        docker info
 
+                        if [ $? -eq 0 ]; then
+                            echo " Login successful"
 
-                        set -e
-                        docker push ${IMAGE_NAME}:${TAG}
-                        docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
-                        docker push ${IMAGE_NAME}:latest
-                        echo "All Docker operations succeeded"
+                            set -e
+                            docker push ${IMAGE_NAME}:${TAG}
+                            docker tag ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:latest
+                            docker push ${IMAGE_NAME}:latest
+                            echo "All Docker operations succeeded"
+
+                        else
+                            echo "Login failed"
+                        fi   
 
                     '''
                 }

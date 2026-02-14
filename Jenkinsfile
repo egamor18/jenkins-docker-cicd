@@ -8,7 +8,7 @@ pipeline {
     }
     parameters{
         
-        string(name: 'ec2_host',defaultValue: 'ubuntu@ec2-52-28-145-250.eu-central-1.compute.amazonaws.com', description: 'username and hostname of the ec2')
+        string(name: 'ec2_host',defaultValue: 'ubuntu@ec2-52-59-202-136.eu-central-1.compute.amazonaws.com', description: 'username and hostname of the ec2')
     }
 
     stages {

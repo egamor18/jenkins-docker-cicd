@@ -94,7 +94,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['server-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${params.ec2_hostname}'
+                    ssh -o StrictHostKeyChecking=no ${params.ec2_hostname.trim()}'
                         docker pull ${IMAGE_NAME}:latest &&
                         docker stop flask-app || true &&
                         docker rm flask-app || true &&

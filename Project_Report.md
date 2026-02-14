@@ -1,139 +1,148 @@
 
-
----
-### PROJECT: AUTOMATIC BUILDING, TESTING, AND DEPLOYMENT OF MICROSERVICE-BASED APPLICATION USING JENKINS (CI / CD)
 ---
 
-# What is Jenkins? — Use Case Explanation
+# **PROJECT: AUTOMATIC BUILDING, TESTING, AND DEPLOYMENT OF A MICROSERVICE-BASED APPLICATION USING JENKINS (CI/CD)**
 
-Jenkins is an **automation server** used to implement **Continuous Integration (CI)** and **Continuous Delivery / Deployment (CD)**.
+---
 
-In practical terms, Jenkins automates the process of:
+# **What is Jenkins? — Use Case Explanation**
+
+Jenkins is an **open-source automation server** used to implement **Continuous Integration (CI)** and **Continuous Delivery/Deployment (CD)** pipelines.
+
+In practical terms, Jenkins automates:
 
 * Building applications
-* Running tests
-* Packaging artifacts (e.g. Docker images)
+* Running automated tests
+* Packaging artifacts (e.g., Docker images)
 * Deploying applications to target environments
 
-In this project, Jenkins acts as the **central orchestrator** that reacts to code changes and executes a predefined pipeline to build, test, package, and deploy a **microservice-based application**.
+In this project, Jenkins acts as the **central orchestration engine** that reacts to source code changes and executes a predefined pipeline to build, test, package, and deploy a **microservice-based Python application**.
 
 ---
 
-# High-Level Flow Summary
+# **High-Level Flow Summary**
 
 ```
-Developer → GitHub → Jenkins → DockerHub → Deployment Target
+Developer → GitHub → Jenkins → DockerHub → Deployment Target (Local / EC2)
 ```
 
-### Step-by-step flow
+**Image 1: Architectural overview**
+![Image 1 – Architectural overview](images/1.overview.png)
+
+---
+
+## **Step-by-Step Workflow**
 
 1. A developer pushes code to GitHub.
 2. GitHub sends a **webhook event** to the Jenkins server.
-3. Jenkins receives the event and detects a change (delta) in the repository.
-4. Jenkins checks out the latest version of the code.
+3. Jenkins receives the event and detects a commit delta.
+4. Jenkins checks out the latest version of the repository.
 5. Jenkins executes the **Declarative Pipeline** defined in the `Jenkinsfile`.
 6. The pipeline:
 
-   * Sets up the test environment
-   * Runs tests
+   * Prepares the Python test environment
+   * Runs unit tests
    * Builds a Docker image
    * Pushes the image to DockerHub
    * Deploys the application
 
-The focus of this setup is a **microservice architecture**, where the application is packaged and deployed as a container.
+This setup follows a **microservice container-based deployment model**, where the application is packaged as an immutable Docker image.
 
 ---
 
-# Pipeline Configuration
+# **Pipeline Configuration**
 
-## Jenkins Configuration Steps
+## **Jenkins Configuration Steps**
 
-1. Install Jenkins on the local machine.
-2. Install required plugins (Git, Docker, Pipeline, Credentials, SSH Agent).
-3. Create a Jenkins pipeline job.
-4. Configure the job to:
+1. Installed Jenkins on a local Linux machine.
+2. Installed required plugins:
+
+   * Git
+   * Pipeline
+   * Docker Pipeline
+   * Credentials Binding
+   * SSH Agent
+   * JUnit
+3. Created a Jenkins Pipeline job.
+4. Configured the job to:
 
    * Use GitHub as the source repository
-   * Load the pipeline definition from `Jenkinsfile`
-5. Configure credentials (DockerHub, SSH, AWS if needed).
+   * Load the pipeline definition from the `Jenkinsfile`
+5. Configured credentials for DockerHub and SSH.
 
-📸 **Screenshot placeholder:**
-
-> Jenkins job configuration page (Pipeline section)
-
----
-
-# Webhook Configuration — Design Decision
-
-## Problem Statement
-
-Jenkins is running **locally on my laptop (LAN)** but GitHub is a **cloud service**.
-
-So the key question is:
-
-> How does GitHub reach a Jenkins server that is not publicly hosted?
+**Image 2: Jenkins job configuration**
+![Image 2 – Jenkins job configuration](images/2.jenkins-configuration.png)
 
 ---
 
-## Initial Attempt: Router Port Forwarding
+# **Webhook Configuration — Design Decision**
 
-I initially configured **port forwarding** on my home router so that incoming HTTP traffic would be forwarded to the Jenkins machine.
+## **Problem Statement**
+
+Jenkins was running **locally on my laptop within a private LAN**, while GitHub is a **public cloud service**.
+
+**Key challenge:**
+
+> How can GitHub send webhook events to a Jenkins instance that is not publicly accessible?
+
+---
+
+## **Initial Attempt: Router Port Forwarding**
+
+I configured **port forwarding** on my home router to forward incoming traffic to the Jenkins host.
 
 However:
 
-* Even after forwarding ports, Jenkins remained unreachable from the internet.
-* Further investigation revealed that my **Internet Service Provider blocks all inbound traffic** except on:
+* Jenkins remained unreachable from the internet.
+* Investigation revealed that the ISP **blocks inbound traffic on all ports except 80 and 443**.
 
-  * HTTP (port 80)
-  * HTTPS (port 443)
+One option was to reconfigure Jenkins to run on port 80/443, but this was rejected to avoid conflicts with system services and security concerns.
 
-📸 **Screenshot placeholder:**
-
-> Router port-forwarding configuration
-One option would be to reconfigure jenkins to listen on any of these ports and then configure the portforwarding to it. I decided against using these specialized ports for jenkins.
 ---
 
-## Final Solution: ngrok Tunneling
+## **Final Solution: ngrok Tunneling**
 
-To work around ISP restrictions, I used **ngrok**, a tunneling service that exposes a local service through a secure public URL.
+To overcome ISP restrictions, I used **ngrok**, which creates a secure public tunnel to a local service.
 
-### Steps taken:
+### **Steps Taken**
 
-1. Registered on the ngrok website.
+1. Registered on the ngrok platform.
 2. Obtained an authentication token.
-3. Installed ngrok on my machine.
-4. Started a tunnel:
+3. Installed ngrok on the local machine.
+4. Started the tunnel:
 
 ```bash
 ngrok http 8080
 ```
 
-This produced a **public HTTPS URL** that forwards traffic directly to my local Jenkins server.
+This generated a **public HTTPS URL** that forwarded traffic directly to Jenkins.
 
-📸 **Screenshot placeholder:**
-
-> ngrok terminal showing public URL
-
----
-
-## GitHub Webhook Configuration
-
-The ngrok-generated URL was used as the **Webhook endpoint** in GitHub.
-
-* Event type: `push`
-* Payload URL: `https://<ngrok-id>.ngrok.io/github-webhook/`
-
-📸 **Screenshot placeholder:**
-
-> GitHub webhook configuration page
-
-> ⚠️ Note: ngrok must be restarted after a system reboot, as the URL changes.
+**Image 3: ngrok tunnel activation**
+![Image 3 – ngrok activation](images/3.ngrok-portforwarding.png)
 
 ---
 
-# Testing the Webhook Integration
+## **GitHub Webhook Configuration**
 
-### Test Steps
+The ngrok URL was configured as the GitHub webhook endpoint:
+
+* **Event type:** `push`
+* **Payload URL:**
+
+  ```
+  https://<ngrok-id>.ngrok.io/github-webhook/
+  ```
+
+**Image 4: GitHub webhook configuration**
+![Image 4 – GitHub webhook configuration](images/4.github-webhook-configuration.png)
+
+> ⚠️ Note: ngrok must be restarted after reboot, as the public URL changes.
+
+---
+
+# **Testing the Webhook Integration**
+
+### **Test Procedure**
 
 ```bash
 git add .
@@ -141,48 +150,53 @@ git commit -m "test webhook"
 git push origin master
 ```
 
-### Result
+### **Observed Result**
 
-1. GitHub receives the push.
-2. GitHub fires a webhook event.
-3. Jenkins receives the event.
-4. Jenkins triggers the pipeline execution.
+1. GitHub received the push.
+2. GitHub triggered the webhook event.
+3. Jenkins received the event.
+4. Jenkins automatically triggered the pipeline.
 
-The receipt of the webhook can be seen in:
+The event was visible in:
 
 * Jenkins build history
 * GitHub webhook delivery logs
 
-📸 **Screenshot placeholder:**
-
-> Jenkins build triggered by GitHub webhook
+**Image 5: Jenkins job triggered by webhook**
+![Image 5 – Webhook trigger confirmation](images/5.Jenkins-job-triggered-by-github-webhook.png)
 
 ---
 
-# Declarative Pipeline Logic (Jenkinsfile)
+# **Declarative Pipeline Logic (Jenkinsfile)**
 
-## Pipeline Responsibilities
+## **Pipeline Responsibilities**
 
-### 1. Prepare Python Test Environment
+### **1. Python Environment Preparation**
 
-* Create a virtual environment
-* Install dependencies from `requirements.txt`
+* Created a Python virtual environment
+* Installed dependencies from `requirements.txt`
 
-### 2. Test the Application
+---
 
-* Execute unit tests using `pytest`
-* Publish test results using JUnit reporting
+### **2. Application Testing**
 
-### 3. Build Docker Image
+* Executed unit tests using `pytest`
+* Published results using JUnit reporting
 
-* Build image using the `Dockerfile`
-* Tag the image using the Jenkins build number
+---
+
+### **3. Docker Image Build**
+
+* Built the Docker image using the `Dockerfile`
+* Tagged the image with the Jenkins build number
 
 ```bash
 docker build -t egamor/jenkins-flask-app:${BUILD_NUMBER} .
 ```
 
-### 4. Tag and Push to DockerHub
+---
+
+### **4. Tagging and Pushing to DockerHub**
 
 ```bash
 docker tag egamor/jenkins-flask-app:${BUILD_NUMBER} egamor/jenkins-flask-app:latest
@@ -191,31 +205,34 @@ docker push egamor/jenkins-flask-app:latest
 
 ---
 
-## DockerHub Authentication
+## **DockerHub Authentication**
 
-Pushing to DockerHub requires authentication.
+Pushing images to DockerHub requires authentication.
 
-* DockerHub credentials are stored **securely in Jenkins Credentials Manager**
-* Credentials are injected at runtime using `withCredentials`
-* Passwords are masked in logs
+* Credentials stored securely in **Jenkins Credentials Manager**
+* Injected using `withCredentials`
+* Passwords masked in Jenkins logs
+* Logs archived using `archiveArtifacts` for debugging
 
-Several credential storage options exist in Jenkins (discussed later).
+**Image 6: DockerHub credentials in Jenkins**
+![Image 6 – DockerHub credentials](images/6.dockerhub-authentication-configuration-script.png)
 
-To preserve logs for troubleshooting, `archiveArtifacts` is used.
+**Image 7: DockerHub login in pipeline script**
+![Image 7 – Pipeline login script](images/7.dockerhub-authentication-configuration.png)
 
 ---
 
-# Deployment Strategy
+# **Deployment Strategy**
 
-## Local Deployment
+## **Local Deployment**
 
-* Application is deployed locally using:
+The application was first deployed locally for validation:
 
 ```bash
 docker run -d -p 5000:5000 egamor/jenkins-flask-app:latest
 ```
 
-* Container status verified using:
+Container status verified with:
 
 ```bash
 docker ps
@@ -223,95 +240,114 @@ docker ps
 
 ---
 
-## Remote Deployment on EC2
+## **Remote Deployment on Amazon EC2**
 
-Jenkins running locally **cannot deploy to EC2 without authentication**.
-
-Some form of trust must exist between Jenkins and the EC2 instance.
-
----
-
-## SSH-Based Deployment
-
-I used **SSH authentication** for remote deployment.
-
-### Steps:
-
-1. Generate a dedicated SSH key for Jenkins:
-
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/jenkins_deploy_key -C "jenkins-deploy"
-```
-
-2. Copy the public key to the EC2 instance:
-
-```bash
-~/.ssh/authorized_keys
-```
-
-3. Add the **private key** to Jenkins credentials as an SSH key.
-
-📸 **Screenshot placeholder:**
-
-> Jenkins SSH credential configuration
-
-> ✅ This is the professional approach: **separate keys per system**, not reusing personal keys.
+A local Jenkins instance **cannot access EC2 without authentication**.
+A secure trust mechanism is required.
 
 ---
 
-# Results and Discussion
+## **SSH-Based Remote Deployment**
 
-* The application deployed successfully.
-* The container was visible using `docker ps -a`.
-* The application was accessible via the exposed port.
-* Logs confirmed successful build, push, and deployment stages.
+SSH authentication was used for EC2 deployment.
 
----
+### **Steps**
 
-# Credential Storage Options in Jenkins
+1. Created an AWS EC2 SSH key pair.
+2. Downloaded the private key.
+3. Stored the private key securely in Jenkins Credentials as an SSH key.
 
-* Username & password
-* Secret text
-* SSH private key
-* AWS credentials
-* Token-based authentication
+**Image 8: SSH key configuration in Jenkins**
+![Image 8 – SSH credentials in Jenkins](images/8.ssh-key-configuration.png)
 
-Each option controls **how credentials are injected and masked** in pipelines.
+This allowed Jenkins to remotely execute commands on EC2 to:
 
----
-
-# Lessons Learned
-
-* Complete automation of CI/CD workflow using Jenkins declarative pipeline
-* How to install and configure Jenkins for different jobs. XXXXXX
-* Security, archiving artifacts, fingerprints, etc.
-* Webhooks require public reachability.
-* ISP restrictions can block CI/CD pipelines.
-* ngrok is effective for local CI experimentation.
-* Credentials must never be hardcoded.
-* Jenkins pipelines should fail fast and log clearly.
-* Separate SSH keys improve security and auditability.
+* Pull the Docker image
+* Stop and remove the old container
+* Start a new container with the updated image
 
 ---
 
-# Installed Jenkins Plugins
+# **End-to-End Pipeline Test**
+
+**Goal:** Full automation triggered by Git push.
+
+1. Code change committed locally.
+2. Code pushed to GitHub.
+3. Webhook triggered Jenkins pipeline.
+4. Jenkins built, tested, pushed, and deployed the application automatically.
+
+---
+
+# **Results and Discussion**
+
+A webhook event triggered Jenkins (Image 9).
+
+**Image 9: Webhook event receipt in Jenkins**
+![Image 9 – Webhook event](images/9.github-webhook-event-received-on-push.png)
+
+Jenkins executed all stages successfully and deployed the application to EC2.
+
+Deployment was verified by:
+
+* Jenkins pipeline logs
+* `docker ps -a` on EC2
+* Accessing the application via the EC2 public IP
+
+**Image 10: Output of `docker ps -a`**
+![Image 11 – docker container](images/10.jenkins-app-deployment.png)
+
+
+**Image 10: Application running on EC2**
+![Image 11 – Flask app on EC2](images/11.checking-app-website.png)
+
+---
+
+# **Credential Storage Options in Jenkins**
+
+* Username & Password
+* Secret Text
+* SSH Private Key
+* AWS Credentials
+* API Tokens
+
+These methods control **secure credential injection and masking** in pipelines.
+
+---
+
+# **Skills Demonstrated**
+
+* End-to-end CI/CD pipeline automation using Jenkins Declarative Pipelines
+* GitHub webhook integration for event-driven builds
+* Local CI tunneling using ngrok
+* Secure credential handling in Jenkins
+* Docker image lifecycle management
+* Automated deployment to Amazon EC2 using SSH
+
+---
+
+# **Installed Jenkins Plugins**
 
 * Git Plugin
 * Pipeline Plugin
-* Docker Pipeline
-* Credentials Binding
-* SSH Agent
+* Docker Pipeline Plugin
+* Credentials Binding Plugin
+* SSH Agent Plugin
 * JUnit Plugin
 
 ---
-Next upgrades
+
+## **Future Work**
+
+* Replace SSH deployment with **AWS IAM Roles + SSM or EKS**
+* Add **blue-green or rolling deployment**
+* Implement **container health checks and rollback logic**
 
 ---
-If you want, next I can:
 
-* Convert this into a **GitHub README.md**
-* Rewrite it as an **interview explanation**
-* Add **diagrams (ASCII or draw.io style)**
-* Tighten it for **DevOps portfolio submission**
+**Thank you for reading.**
 
-Just say the word.
+**Eric Gamor**
+AI / DevOps / Cloud Engineer
+
+---

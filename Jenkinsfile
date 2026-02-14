@@ -6,6 +6,10 @@ pipeline {
         IMAGE_NAME = "egamor/jenkins-flask-app"
         TAG = 3
     }
+    parameters{
+        
+        string(name: 'ec2_hostname', description: 'username and hostname of the ec2')
+    }
 
     stages {
 
@@ -90,7 +94,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['server-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ubuntu@ec2-52-59-219-191.eu-central-1.compute.amazonaws.com '
+                    ssh -o StrictHostKeyChecking=no ${params.ec2_hostname}'
                         docker pull ${IMAGE_NAME}:latest &&
                         docker stop flask-app || true &&
                         docker rm flask-app || true &&
@@ -98,6 +102,7 @@ pipeline {
                     '
                     """
                 }
+                //ubuntu@ec2-52-59-219-191.eu-central-1.compute.amazonaws.com 
             }
         }
 

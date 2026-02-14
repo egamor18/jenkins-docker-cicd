@@ -91,6 +91,25 @@ pipeline {
         }
 
         stage('Deploy') {
+            steps {
+                 def host = params.ec2_host.trim()
+                sshagent(credentials: ['server-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${host}  '
+                        docker pull ${IMAGE_NAME}:latest &&
+                        docker stop flask-app || true &&
+                        docker rm flask-app || true &&
+                        docker run -d --name flask-app -p 5000:5000 ${IMAGE_NAME}:latest
+                    '
+                    """
+                }
+            }
+        }
+
+
+
+    /*
+    stage('Deploy') {
       steps {
         script {
           def host = params.ec2_host.trim()
@@ -105,7 +124,7 @@ pipeline {
         }
       }
     }
-
+    */
     } // <-- closing brace for stages
 
 } // <-- closing brace for pipeline

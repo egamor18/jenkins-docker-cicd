@@ -8,7 +8,7 @@ pipeline {
     }
     parameters{
         
-        string(name: 'ec2_hostname', description: 'username and hostname of the ec2')
+        string(name: 'ec2_host',defaultValue: 'ubuntu@ec2-52-28-145-250.eu-central-1.compute.amazonaws.com', description: 'username and hostname of the ec2')
     }
 
     stages {
@@ -91,20 +91,20 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sshagent(credentials: ['server-ssh-key']) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${params.ec2_hostname.trim()}'
-                        docker pull ${IMAGE_NAME}:latest &&
-                        docker stop flask-app || true &&
-                        docker rm flask-app || true &&
-                        docker run -d --name flask-app -p 5000:5000 ${IMAGE_NAME}:latest
-                    '
-                    """
-                }
-                //ubuntu@ec2-52-59-219-191.eu-central-1.compute.amazonaws.com 
-            }
+      steps {
+        script {
+          def host = params.ec2_host.trim()
+          sh """
+            ssh -o StrictHostKeyChecking=no ubuntu@${host} "
+              docker pull egamor/jenkins-flask-app:latest &&
+              docker stop flask-app || true &&
+              docker rm flask-app || true &&
+              docker run -d --name flask-app -p 5000:5000 egamor/jenkins-flask-app:latest
+            "
+          """
         }
+      }
+    }
 
     } // <-- closing brace for stages
 

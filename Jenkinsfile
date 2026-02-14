@@ -106,25 +106,6 @@ pipeline {
             }
         }
 
-
-
-    /*
-    stage('Deploy') {
-      steps {
-        script {
-          def host = params.ec2_host.trim()
-          sh """
-            ssh -o StrictHostKeyChecking=no ${host} "
-              docker pull egamor/jenkins-flask-app:latest &&
-              docker stop flask-app || true &&
-              docker rm flask-app || true &&
-              docker run -d --name flask-app -p 5000:5000 egamor/jenkins-flask-app:latest
-            "
-          """
-        }
-      }
-    }
-    */
     } // <-- closing brace for stages
 
 } // <-- closing brace for pipeline

@@ -66,7 +66,7 @@ This Jenkinsfile handles **build → test → Docker build → deploy**:
 
 ---
 
-## **Step 6: Best Practices**
+## **Step 5: Best Practices**
 
 * Archive test results with `junit` for historical reporting
 * Use `archiveArtifacts` for Python build artifacts if needed

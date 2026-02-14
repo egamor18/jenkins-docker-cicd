@@ -92,10 +92,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                 def host = params.ec2_host.trim()
+                 //def host = params.ec2_host.trim()
                 sshagent(credentials: ['server-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${host}  '
+                    ssh -o StrictHostKeyChecking=no ${params.ec2_host.trim()}  '
                         docker pull ${IMAGE_NAME}:latest &&
                         docker stop flask-app || true &&
                         docker rm flask-app || true &&

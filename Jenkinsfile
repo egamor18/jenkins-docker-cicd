@@ -95,7 +95,7 @@ pipeline {
         script {
           def host = params.ec2_host.trim()
           sh """
-            ssh -o StrictHostKeyChecking=no ubuntu@${host} "
+            ssh -o StrictHostKeyChecking=no ${host} "
               docker pull egamor/jenkins-flask-app:latest &&
               docker stop flask-app || true &&
               docker rm flask-app || true &&

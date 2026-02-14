@@ -281,12 +281,9 @@ This allowed Jenkins to remotely execute commands on EC2 to:
 
 # **Results and Discussion**
 
-A webhook event triggered Jenkins (Image 9).
+A webhook event triggered by Github was successfully received by Jenkins (Image 5).
 
-**Image 9: Webhook event receipt in Jenkins**
-![Image 9 – Webhook event](images/9.github-webhook-event-received-on-push.png)
-
-Jenkins executed all stages successfully and deployed the application to EC2.
+Jenkins then went ahead and executed all stages successfully and deployed the application to EC2.
 
 Deployment was verified by:
 
@@ -294,12 +291,12 @@ Deployment was verified by:
 * `docker ps -a` on EC2
 * Accessing the application via the EC2 public IP
 
-**Image 10: Output of `docker ps -a`**
-![Image 11 – docker container](images/10.jenkins-app-deployment.png)
+**Image 9: Output of `docker ps -a`**
+![Image 9 – docker container](images/10.jenkins-app-deployment.png)
 
 
 **Image 10: Application running on EC2**
-![Image 11 – Flask app on EC2](images/11.checking-app-website.png)
+![Image 10 – Flask app on EC2](images/11.checking-app-website.png)
 
 ---
 

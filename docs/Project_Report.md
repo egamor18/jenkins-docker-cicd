@@ -21,13 +21,8 @@ In this project, Jenkins acts as the **central orchestration engine** that react
 ---
 
 # **High-Level Flow Summary**
-
-```
-Developer → GitHub → Jenkins → DockerHub → Deployment Target (Local / EC2)
-```
-
-**Image 1: Architectural overview**
-![Image 1 – Architectural overview](images/1.overview.png)
+![Image 1 – Architectural overview](images/1.architecture.png)
+*Image 1: Architectural overview*
 
 ---
 
@@ -72,6 +67,7 @@ This setup follows a **microservice container-based deployment model**, where th
 
 **Image 2: Jenkins job configuration**
 ![Image 2 – Jenkins job configuration](images/2.jenkins-configuration.png)
+
 
 ---
 

@@ -313,7 +313,7 @@ These methods control **secure credential injection and masking** in pipelines.
 * End-to-end CI/CD pipeline automation using Jenkins Declarative Pipelines
 * GitHub webhook integration for event-driven builds
 * Local CI tunneling using ngrok
-* Secure credential handling in Jenkins
+* Secure credentials handling in Jenkins
 * Docker image lifecycle management
 * Automated deployment to Amazon EC2 using SSH
 
